@@ -13,3 +13,4 @@ SWE-bench/
 
 /runs/
 /.mlflow/
+/diagrams/export/

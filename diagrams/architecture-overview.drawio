@@ -116,7 +116,7 @@
         <mxCell id="ic-s3" parent="1" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://api.iconify.design/mdi/pail-outline.svg?color=%230e7c66;fontSize=10;" value="" vertex="1">
           <mxGeometry height="36" width="36" x="1080" y="675" as="geometry" />
         </mxCell>
-        <mxCell id="txt-s3" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;fillColor=none;strokeColor=none;" value="S3-compatible bucket&#xa;runs/&lt;run-id&gt;/ archive&#xa;one URI = whole run" vertex="1">
+        <mxCell id="txt-s3" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;fillColor=none;strokeColor=none;" value="S3-compatible bucket&#xa;runs/&amp;lt;run-id&amp;gt;/ archive&#xa;one URI = whole run" vertex="1">
           <mxGeometry height="60" width="140" x="1130" y="675" as="geometry" />
         </mxCell>
 
@@ -172,7 +172,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="e-upload" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;strokeColor=#0e7c66;strokeWidth=2.5;fontSize=11;fontColor=#0e7c66;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="upload runs/&lt;run-id&gt;/" edge="1" source="box-tasks" target="box-s3">
+        <mxCell id="e-upload" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;strokeColor=#0e7c66;strokeWidth=2.5;fontSize=11;fontColor=#0e7c66;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="upload runs/&amp;lt;run-id&amp;gt;/" edge="1" source="box-tasks" target="box-s3">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="1040" y="600" />
