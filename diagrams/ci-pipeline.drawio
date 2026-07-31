@@ -1,0 +1,93 @@
+<mxfile host="app.diagrams.net" agent="drawio-architecture" version="29.4.0">
+  <diagram id="ci-pipeline" name="CI Pipeline">
+    <mxGraphModel dx="1400" dy="620" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="620" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;fillColor=none;strokeColor=none;" value="CI — GitHub Actions" vertex="1">
+          <mxGeometry height="36" width="900" x="250" y="24" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontStyle=2;fontColor=#666666;fillColor=none;strokeColor=none;" value="every push and PR · lint + tests + compose validation + image build · 55 s first green run" vertex="1">
+          <mxGeometry height="22" width="1200" x="100" y="66" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box-dev" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eef2f7;strokeColor=#3b5b78;strokeWidth=2;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" value="developer" vertex="1">
+          <mxGeometry height="110" width="200" x="80" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ic-dev" parent="1" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://api.iconify.design/mdi/laptop.svg?color=%23455a64;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="34" width="34" x="100" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="txt-dev" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;fillColor=none;strokeColor=none;" value="git push&#xa;pull request" vertex="1">
+          <mxGeometry height="40" width="120" x="150" y="305" as="geometry" />
+        </mxCell>
+
+        <mxCell id="zone-gh" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 8;fillColor=none;strokeColor=#181717;strokeWidth=2;align=right;verticalAlign=top;spacingRight=14;spacingTop=8;fontSize=13;fontStyle=1;fontColor=#181717;" value="GitHub" vertex="1">
+          <mxGeometry height="380" width="700" x="360" y="140" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box-repo" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#181717;strokeWidth=2;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" value="repository" vertex="1">
+          <mxGeometry height="110" width="190" x="400" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="ic-repo" parent="1" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.simpleicons.org/github/181717;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="34" width="34" x="420" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="txt-repo" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;fillColor=none;strokeColor=none;" value="main branch&#xa;ci.yml workflow" vertex="1">
+          <mxGeometry height="40" width="110" x="465" y="296" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box-job1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff4e5;strokeColor=#e67e22;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=12;fontStyle=1;" value="job: lint-and-test" vertex="1">
+          <mxGeometry height="120" width="360" x="660" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="ic-job1" parent="1" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://cdn.simpleicons.org/githubactions/2088FF;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="28" width="28" x="680" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="txt-job1" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;fillColor=none;strokeColor=none;" value="uv sync --locked&#xa;ruff check · pytest (8 tests)&#xa;docker compose config" vertex="1">
+          <mxGeometry height="60" width="280" x="720" y="222" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box-job2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff4e5;strokeColor=#e67e22;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontSize=12;fontStyle=1;" value="job: docker-image" vertex="1">
+          <mxGeometry height="100" width="360" x="660" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="txt-job2" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;fillColor=none;strokeColor=none;" value="docker build (pipeline image)&#xa;3 MB context thanks to .dockerignore" vertex="1">
+          <mxGeometry height="40" width="300" x="680" y="385" as="geometry" />
+        </mxCell>
+
+        <mxCell id="box-checks" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#2e7d32;strokeWidth=2;verticalAlign=top;fontSize=12;fontStyle=1;spacingTop=6;" value="checks on commit / PR" vertex="1">
+          <mxGeometry height="110" width="200" x="1140" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ic-checks" parent="1" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://api.iconify.design/mdi/check-decagram.svg?color=%232e7d32;fontSize=10;" value="" vertex="1">
+          <mxGeometry height="34" width="34" x="1160" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="txt-checks" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;fillColor=none;strokeColor=none;" value="both jobs green&#xa;before merge" vertex="1">
+          <mxGeometry height="40" width="120" x="1210" y="305" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#bdbdbd;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;fontSize=11;fontStyle=1;" value="legend" vertex="1">
+          <mxGeometry height="80" width="220" x="1140" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="l4a" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#7c3aed;fillColor=none;strokeColor=none;" value="&#9644; control / trigger" vertex="1">
+          <mxGeometry height="18" width="190" x="1155" y="166" as="geometry" />
+        </mxCell>
+        <mxCell id="l4b" parent="1" style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#2e7d32;fillColor=none;strokeColor=none;" value="&#9644; results" vertex="1">
+          <mxGeometry height="18" width="190" x="1155" y="188" as="geometry" />
+        </mxCell>
+
+        <mxCell id="c1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;strokeColor=#7c3aed;strokeWidth=2.5;fontSize=11;fontColor=#7c3aed;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="push / PR" edge="1" source="box-dev" target="box-repo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;strokeColor=#7c3aed;strokeWidth=2;fontSize=11;fontColor=#7c3aed;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="trigger" edge="1" source="box-repo" target="box-job1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;strokeColor=#7c3aed;strokeWidth=2;fontSize=11;fontColor=#7c3aed;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" value="trigger" edge="1" source="box-repo" target="box-job2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;strokeColor=#2e7d32;strokeWidth=2;fontSize=11;fontColor=#2e7d32;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" value="" edge="1" source="box-job1" target="box-checks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=classic;strokeColor=#2e7d32;strokeWidth=2;fontSize=11;fontColor=#2e7d32;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" value="" edge="1" source="box-job2" target="box-checks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
