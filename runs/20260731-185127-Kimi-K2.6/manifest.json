@@ -1,0 +1,25 @@
+{
+  "run_id": "20260731-185127-Kimi-K2.6",
+  "created_at": "2026-07-31T18:51:27.224337+00:00",
+  "config": "config.json",
+  "predictions": "run-agent/preds.json",
+  "trajectories_dir": "run-agent/",
+  "eval_dir": "run-eval/",
+  "metrics": "metrics.json",
+  "resolve_rate": 1.0,
+  "artifact_uri": "local:///home/develeap/AI/e2emlops/runs/20260731-185127-Kimi-K2.6",
+  "files": {
+    "config.json": 440,
+    "metrics.json": 246,
+    "run-agent/astropy__astropy-12907/astropy__astropy-12907.traj.json": 224853,
+    "run-agent/exit_statuses_1785523892.2443857.yaml": 70,
+    "run-agent/minisweagent.log": 1031,
+    "run-agent/preds.json": 678,
+    "run-eval/logs/run_evaluation/20260731-185127-Kimi-K2.6/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/eval.sh": 2123,
+    "run-eval/logs/run_evaluation/20260731-185127-Kimi-K2.6/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/patch.diff": 504,
+    "run-eval/logs/run_evaluation/20260731-185127-Kimi-K2.6/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/report.json": 2123,
+    "run-eval/logs/run_evaluation/20260731-185127-Kimi-K2.6/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/run_instance.log": 4357,
+    "run-eval/logs/run_evaluation/20260731-185127-Kimi-K2.6/nebius__moonshotai__Kimi-K2.6/astropy__astropy-12907/test_output.txt": 298969,
+    "run-eval/nebius__moonshotai__Kimi-K2.6.20260731-185127-Kimi-K2.6.json": 17226
+  }
+}
