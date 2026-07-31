@@ -28,8 +28,8 @@ x-airflow-common: &airflow-common
     NEBIUS_API_KEY: ${NEBIUS_API_KEY:?set in .env}
     S3_BUCKET: ${S3_BUCKET:-}
     S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
-    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
-    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+    S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+    S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
   user: "${AIRFLOW_UID:-50000}:0"
   group_add:
     - "${DOCKER_GID:?see .env.example}"

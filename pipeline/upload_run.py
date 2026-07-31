@@ -1,8 +1,9 @@
 """Upload a run folder to S3-compatible Object Storage: python -m pipeline.upload_run <run_dir>.
 
-Reads S3_BUCKET and S3_ENDPOINT_URL (plus standard AWS_* credentials) from the
-environment. Without S3_BUCKET the step is a documented no-op so the pipeline
-also works in local-only setups.
+Nebius Object Storage speaks the S3 protocol; credentials are Nebius-issued
+keys passed explicitly from S3_* variables (no AWS involvement, and boto3 is
+just the standard S3 protocol client). Without S3_BUCKET the step is a
+documented no-op so the pipeline also works in local-only setups.
 """
 
 import os
@@ -18,7 +19,12 @@ def main(run_dir: str) -> None:
 
     import boto3
 
-    client = boto3.client("s3", endpoint_url=os.environ.get("S3_ENDPOINT_URL"))
+    client = boto3.client(
+        "s3",
+        endpoint_url=os.environ.get("S3_ENDPOINT_URL"),
+        aws_access_key_id=os.environ.get("S3_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.environ.get("S3_SECRET_ACCESS_KEY"),
+    )
     run_path = Path(run_dir)
     prefix = f"runs/{run_path.name}"
     files = [p for p in sorted(run_path.rglob("*")) if p.is_file()]

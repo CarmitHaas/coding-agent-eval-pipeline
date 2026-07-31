@@ -1,0 +1,34 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check .
+      - name: Tests
+        run: uv run pytest -q
+      - name: Validate compose file
+        run: docker compose config --quiet
+        env:
+          HOST_PROJECT_DIR: .
+          DOCKER_GID: "999"
+          AIRFLOW_JWT_SECRET: ci-placeholder
+          AIRFLOW_ADMIN_PASSWORD: ci-placeholder
+          NEBIUS_API_KEY: ci-placeholder
+
+  docker-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build pipeline image
+        run: docker build -t e2emlops-pipeline:ci .
