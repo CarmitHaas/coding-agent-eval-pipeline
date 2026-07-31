@@ -66,16 +66,18 @@ services:
 
   airflow-init:
     <<: *airflow-common
+    # Root + /entrypoint delegation is the upstream-documented init pattern:
+    # the entrypoint prepares the env for arbitrary UIDs, migrates the DB, and
+    # creates the admin user from the _AIRFLOW_* flags.
+    user: "0:0"
     entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        airflow db migrate
-        airflow users create \
-          --username "${AIRFLOW_ADMIN_USER:-admin}" \
-          --password "${AIRFLOW_ADMIN_PASSWORD:?set in .env}" \
-          --firstname Admin --lastname User --role Admin \
-          --email admin@example.com || true
+    command: ["-c", "exec /entrypoint airflow version"]
+    environment:
+      <<: *airflow-env
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_ADMIN_USER:-admin}
+      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:?set in .env}
     depends_on:
       postgres:
         condition: service_healthy
