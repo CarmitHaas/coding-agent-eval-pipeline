@@ -22,7 +22,8 @@ def main(run_dir: str) -> None:
     mlflow.set_experiment("coding-agent-eval")
     with mlflow.start_run(run_name=config["run_id"]):
         mlflow.log_params({k: config[k] for k in PARAM_KEYS})
-        mlflow.log_metrics({k: v for k, v in metrics.items() if isinstance(v, (int, float))})
+        mlflow.log_metrics({k: v for k, v in metrics.items()
+                            if isinstance(v, (int, float)) and not isinstance(v, bool)})
         mlflow.set_tag("run_id", config["run_id"])
         mlflow.set_tag("artifact_uri", manifest["artifact_uri"])
         for name in ["config.json", "metrics.json", "manifest.json"]:

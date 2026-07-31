@@ -156,6 +156,14 @@ def build_manifest(run_config: dict, metrics: dict, artifact_uri: str | None = N
     }
 
 
+def artifact_uri_for(run_id: str, run_dir: str | Path) -> str:
+    """Where the durable copy of this run lives: S3 when configured, else local."""
+    bucket = os.environ.get("S3_BUCKET")
+    if bucket:
+        return f"s3://{bucket}/runs/{run_id}"
+    return f"local://{run_dir}"
+
+
 def subprocess_env(project_root: str | Path, extra: dict | None = None) -> dict:
     """Environment for agent/eval subprocesses: project venv first on PATH,
     .env values injected, cost tracking tolerant of unpriced models."""

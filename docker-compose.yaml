@@ -1,0 +1,142 @@
+---
+# Airflow 3 + MLflow deployment for the evaluation pipeline.
+#
+# Network layout (least exposure):
+#   db-net  (internal) - postgres and the Airflow services that query it; no egress
+#   app-net            - MLflow + Airflow services + DockerOperator task containers
+# Published ports bind to 127.0.0.1 only; reach the UIs through an SSH tunnel:
+#   ssh -L 8080:localhost:8080 -L 5000:localhost:5000 <user>@<vm>
+
+x-airflow-common: &airflow-common
+  image: apache/airflow:3.3.0
+  environment: &airflow-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__DAGS_FOLDER: /opt/project/dags
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET:?set in .env}
+    _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker==4.5.8
+    # pipeline configuration
+    EXECUTION_MODE: docker
+    E2E_PROJECT_ROOT: /opt/project
+    HOST_PROJECT_DIR: ${HOST_PROJECT_DIR:?set in .env}
+    PIPELINE_IMAGE: e2emlops-pipeline:latest
+    DOCKER_NETWORK: e2emlops-app-net
+    MLFLOW_TRACKING_URI: http://mlflow:5000
+    NEBIUS_API_KEY: ${NEBIUS_API_KEY:?set in .env}
+    S3_BUCKET: ${S3_BUCKET:-}
+    S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+    AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+    AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+  user: "${AIRFLOW_UID:-50000}:0"
+  group_add:
+    - "${DOCKER_GID:?see .env.example}"
+  volumes:
+    - ${HOST_PROJECT_DIR}:/opt/project
+    - airflow-logs:/opt/airflow/logs
+    - /var/run/docker.sock:/var/run/docker.sock
+  depends_on: &airflow-depends
+    postgres:
+      condition: service_healthy
+    airflow-init:
+      condition: service_completed_successfully
+  networks:
+    - db-net
+    - app-net
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: always
+    networks:
+      - db-net
+
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create \
+          --username "${AIRFLOW_ADMIN_USER:-admin}" \
+          --password "${AIRFLOW_ADMIN_PASSWORD:?set in .env}" \
+          --firstname Admin --lastname User --role Admin \
+          --email admin@example.com || true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  airflow-apiserver:
+    <<: *airflow-common
+    command: api-server
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 30s
+      retries: 5
+      start_period: 30s
+    restart: always
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    restart: always
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    restart: always
+
+  airflow-triggerer:
+    <<: *airflow-common
+    command: triggerer
+    restart: always
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.15.0
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow-data/mlflow.db
+      --artifacts-destination /mlflow-data/artifacts
+    volumes:
+      - mlflow-data:/mlflow-data
+    ports:
+      - "127.0.0.1:5000:5000"
+    restart: always
+    networks:
+      - app-net
+
+  # Build target for the pipeline image used by DockerOperator tasks:
+  #   docker compose --profile build build pipeline-image
+  pipeline-image:
+    build: .
+    image: e2emlops-pipeline:latest
+    command: ["true"]
+    profiles: ["build"]
+
+networks:
+  db-net:
+    name: e2emlops-db-net
+    internal: true
+  app-net:
+    name: e2emlops-app-net
+
+volumes:
+  postgres-db:
+  airflow-logs:
+  mlflow-data:

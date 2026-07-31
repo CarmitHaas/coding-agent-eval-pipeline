@@ -54,6 +54,30 @@ def test_collect_metrics_when_eval_skipped(tmp_path):
     assert metrics["eval_report_found"] is False
 
 
+def test_artifact_uri_prefers_s3_when_configured(monkeypatch):
+    monkeypatch.delenv("S3_BUCKET", raising=False)
+    assert helpers.artifact_uri_for("r1", "/x/runs/r1") == "local:///x/runs/r1"
+    monkeypatch.setenv("S3_BUCKET", "my-bucket")
+    assert helpers.artifact_uri_for("r1", "/x/runs/r1") == "s3://my-bucket/runs/r1"
+
+
+def test_run_step_summarize_writes_metrics_and_manifest(tmp_path, monkeypatch):
+    from pipeline import run_step
+
+    monkeypatch.delenv("S3_BUCKET", raising=False)
+    run_dir = tmp_path / "runs" / "r9"
+    (run_dir / "run-eval").mkdir(parents=True)
+    (run_dir / "config.json").write_text(json.dumps(
+        {"run_id": "r9", "run_dir": "/somewhere/else/runs/r9", "created_at": "now"}))
+    config = run_step.load_config(run_dir)
+    assert config["run_dir"] == str(run_dir)  # rebased onto local view
+    run_step.step_summarize(config, run_dir)
+    metrics = json.loads((run_dir / "metrics.json").read_text())
+    assert metrics["submitted_instances"] == 0 and metrics["eval_report_found"] is False
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    assert manifest["artifact_uri"] == f"local://{run_dir}"
+
+
 def test_manifest_lists_files(tmp_path):
     cfg = {"run_id": "r", "run_dir": str(tmp_path), "created_at": "now"}
     (tmp_path / "config.json").write_text("{}")

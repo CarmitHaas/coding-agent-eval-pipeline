@@ -1,0 +1,12 @@
+.venv
+.git
+.mlflow
+.ruff_cache
+__pycache__
+runs
+sample
+trajectory.json
+logs
+mini-swe-agent
+SWE-bench
+.env
