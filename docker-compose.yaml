@@ -74,6 +74,8 @@ services:
     command: ["-c", "exec /entrypoint airflow version"]
     environment:
       <<: *airflow-env
+      # init needs no extra providers, and the entrypoint refuses pip-as-root
+      _PIP_ADDITIONAL_REQUIREMENTS: ""
       _AIRFLOW_DB_MIGRATE: "true"
       _AIRFLOW_WWW_USER_CREATE: "true"
       _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_ADMIN_USER:-admin}
