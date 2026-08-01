@@ -1,3 +1,111 @@
+# An Airflow Evaluation Pipeline for Coding Agents
+
+Take the ad-hoc scripts a research team runs by hand over SSH, and turn them into a push-button
+pipeline: mini-swe-agent solves real GitHub issues from SWE-bench Verified, the SWE-bench harness
+grades every patch with the project's own test suite, and Airflow, MLflow, and Object Storage make
+each experiment reproducible, comparable, and durable. Built and run end to end on Nebius, where
+the pipeline's best batch resolved **8 of 15 real astropy bugs (53.3%)** with Kimi-K2.6.
+
+![Airflow](https://img.shields.io/badge/Airflow-3.3-017CEE?logo=apacheairflow&logoColor=white)
+![MLflow](https://img.shields.io/badge/MLflow-3.15-0194E2?logo=mlflow&logoColor=white)
+![Docker](https://img.shields.io/badge/DockerOperator-compose-2496ED?logo=docker&logoColor=white)
+![SWE-bench](https://img.shields.io/badge/SWE--bench-Verified-4b32c3)
+![CI](https://github.com/CarmitHaas/coding-agent-eval-pipeline/actions/workflows/ci.yml/badge.svg)
+
+**Full writeup with every number: [REPORT.md](REPORT.md).**
+
+![Cloud architecture](diagrams/architecture-overview.png)
+
+<sub>Diagram source: [`diagrams/architecture-overview.drawio`](diagrams/architecture-overview.drawio). Export to PNG from the drawio editor to refresh. More diagrams, including the DAG flow, the container isolation model, and the two-loops concept view, live in [`diagrams/`](diagrams/).</sub>
+
+## What I built
+
+- **A six-task Airflow DAG** ([`dags/evaluate_agent.py`](dags/evaluate_agent.py)):
+  `prepare_run -> run_agent -> run_eval -> summarize -> upload_artifacts -> log_mlflow`, with all
+  8 experiment knobs (split, subset, workers, model, slice, run id, cost limit, token budget) as
+  validated UI parameters. Nothing about the experiment is hardcoded.
+- **One entrypoint, two isolation levels.** Every step runs `python -m pipeline.run_step`, as a
+  local subprocess under `airflow standalone` or as a `DockerOperator` container under compose.
+  The same code was tested locally and deployed unchanged.
+- **A durable run folder per experiment**: config, predictions, full agent trajectories,
+  evaluation logs and report, metrics, and a manifest. Hand someone the folder (or its S3 URI)
+  and they can reconstruct the run.
+- **MLflow tracking** with one comparable row per run, and **S3 upload** to Nebius Object Storage
+  that skips itself cleanly when no bucket is configured.
+- **A docker compose deployment** with segmented networks (the database network is internal-only)
+  and UIs bound to `127.0.0.1` behind an SSH tunnel. Nothing is exposed on the public IP.
+- **CI on every push**: ruff, 8 pytest tests over the pure helper layer, compose validation, and
+  a build of the pipeline image.
+
+## Key results, honestly
+
+**The showcase batch: 8 of 15 resolved.** Fifteen astropy issues, 4 workers, 29.5 minutes end to
+end (25 for the agent episodes, 4.6 for all evaluations). All 15 episodes submitted patches, all
+15 applied cleanly; the 7 misses are patches the project's own tests rejected. The agent's
+failure mode is "plausible but wrong", never "stuck".
+
+**The biggest lever was one config line.** With no explicit output-token limit, 11 of 11 episodes
+(mine and the instructor's sample batches combined) died mid-thought in `RepeatedFormatError`.
+With `model.model_kwargs.max_tokens` set, 19 of 19 submitted patches. The full investigation is
+in [REPORT.md](REPORT.md#6-the-max_output_tokens-investigation).
+
+**Deployment surfaced five real failures**, each now fixed in git history and documented: an
+image-pull race against a 120 second container-start window, a reserved Airflow kwarg, the
+official image's arbitrary-UID behavior, a pip-as-root refusal, and MLflow 3's DNS-rebinding
+guard rejecting container-internal hostnames.
+
+![Airflow: three production runs, all green](screenshots/airflow_dag.png)
+![MLflow: comparing the three runs](screenshots/mlflow_compare.png)
+
+## Reproduce it
+
+### Local (airflow standalone)
+
+```bash
+git clone https://github.com/CarmitHaas/coding-agent-eval-pipeline.git
+cd coding-agent-eval-pipeline
+cp .env.example .env            # fill NEBIUS_API_KEY
+uv sync
+set -a && . ./.env && set +a
+bash run-airflow-standalone.sh  # UI at localhost:8080
+# trigger evaluate_agent from the UI; defaults run one instance
+```
+
+### Production style (VM + docker compose)
+
+```bash
+# on an 8 vCPU / 32 GB Ubuntu VM with Docker
+git clone https://github.com/CarmitHaas/coding-agent-eval-pipeline.git
+cd coding-agent-eval-pipeline
+cp .env.example .env            # fill every variable; comments explain each one
+docker compose --profile build build pipeline-image
+docker compose up -d
+# from your machine:
+ssh -L 8080:localhost:8080 -L 5000:localhost:5000 <user>@<vm>
+# Airflow at localhost:8080, MLflow at localhost:5000
+```
+
+Rerunning a specific run: trigger the DAG with its `run_id` as a parameter. The run folder is
+reused and instances that already have trajectories are skipped.
+
+## Repo layout
+
+| Path | What it is |
+|---|---|
+| [`dags/evaluate_agent.py`](dags/evaluate_agent.py) | The pipeline DAG: params, retry policy, both execution modes. |
+| [`pipeline/`](pipeline/) | Pure helpers, the `run_step` entrypoint, the S3 uploader, the MLflow logger. |
+| [`docker-compose.yaml`](docker-compose.yaml) | Airflow + PostgreSQL + MLflow, segmented networks, localhost-only ports. |
+| [`Dockerfile`](Dockerfile) | The task image DockerOperator runs. |
+| [`tests/`](tests/) | 8 tests over the helper layer, including one fed by the instructor's sample report. |
+| [`runs/`](runs/) | Committed evidence: one complete resolved run, plus the showcase run's key files. |
+| [`diagrams/`](diagrams/) | Five drawio architecture diagrams with PNG exports. |
+| [`screenshots/`](screenshots/) | Airflow, MLflow, and Object Storage evidence. |
+| [`REPORT.md`](REPORT.md) | The full writeup: architecture, every run, every failure, every number. |
+
+---
+
+> The original assignment brief follows, kept for context.
+
 # Home assignment: Evaluation pipeline for coding-agent experiments
 
 **What**: Home assignment.

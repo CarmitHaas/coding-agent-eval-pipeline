@@ -1,0 +1,14 @@
+{
+  "run_id": "20260731-225125-Kimi-K2.6",
+  "run_dir": "/opt/project/runs/20260731-225125-Kimi-K2.6",
+  "project_root": "/opt/project",
+  "split": "test",
+  "subset": "verified",
+  "dataset": "princeton-nlp/SWE-bench_Verified",
+  "workers": 4,
+  "model": "nebius/moonshotai/Kimi-K2.6",
+  "task_slice": "0:15",
+  "cost_limit": 0.0,
+  "max_output_tokens": 8192,
+  "created_at": "2026-07-31T22:51:25.296586+00:00"
+}

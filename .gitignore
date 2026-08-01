@@ -1,16 +1,26 @@
+# Python
 __pycache__
 .ruff_cache
 .venv
+
+# Env / secrets
 .env
 
+# Scratch outputs of the starter scripts
 /trajectories/
 /trajectory.json
-
 /logs/
 
+# Upstream reference clones (per the assignment setup; not part of the pipeline)
 mini-swe-agent/
 SWE-bench/
 
+# Run artifacts: ignored by default; evidence runs are force-added on purpose
+# (runs/20260731-185127* in full, runs/20260731-225125* key files)
 /runs/
+
+# Local MLflow backend from the standalone phase
 /.mlflow/
+
+# Headless drawio export scratch (the curated PNGs live in diagrams/ itself)
 /diagrams/export/

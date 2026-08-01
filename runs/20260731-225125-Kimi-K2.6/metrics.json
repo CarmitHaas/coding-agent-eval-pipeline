@@ -1,0 +1,11 @@
+{
+  "total_instances": 500,
+  "submitted_instances": 15,
+  "completed_instances": 15,
+  "resolved_instances": 8,
+  "unresolved_instances": 7,
+  "empty_patch_instances": 0,
+  "error_instances": 0,
+  "resolve_rate": 0.5333333333333333,
+  "eval_report_found": true
+}
